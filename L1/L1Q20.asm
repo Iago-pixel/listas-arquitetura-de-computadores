@@ -13,7 +13,7 @@ main:	addi $2, $0, 5
 	mfhi $11 # c
 	
 	addi $8, $0, 4
-	div $2, $8
+	div $10, $8
 	mflo $12 # d
 	
 	mfhi $13 # e
@@ -65,7 +65,7 @@ main:	addi $2, $0, 5
 	mul $20, $20, $19
 	add $21, $21, $20
 	div $21, $8
-	mfhi $21 # m
+	mflo $21 # m
 	
 	addi $8, $0, 31
 	add $20, $16, $19
@@ -74,7 +74,7 @@ main:	addi $2, $0, 5
 	sub $20, $20, $22
 	addi $20, $20, 114
 	div $20, $8
-	mflo $20 # MÊS
+	mflo $20 # MES
 	
 	addi $22, $0, -7
 	mul $22, $22, $21

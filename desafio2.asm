@@ -69,7 +69,7 @@ sainpc:
 # rotina para gastar tempo      
 # usado: $25
 nulltime:
-        addi $25, $0, 10000
+        addi $25, $0, 100000
 ntfor:  beq $25, $0, ntfim
         nop
         nop

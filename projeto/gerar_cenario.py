@@ -149,7 +149,7 @@ escada(654, 4, invertida=True)
 escada(763, 8, final_duplicado=True)
 escada(835, 1)
 
-with open("data.txt", "w", encoding="utf-8") as arquivo:
+with open("cenario.asm", "w", encoding="utf-8") as arquivo:
     arquivo.write(".data 0x10018000\n")
     for linha in data:
         arquivo.write(".word")

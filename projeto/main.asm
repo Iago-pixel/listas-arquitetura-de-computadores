@@ -12,16 +12,31 @@ main:	add $14, $0, $0		#$14 - move para direita
 	gerartela:
 		addi $12, $0, 128	#$12 - contador de UG
 		gerarlinha:
-			lw $13, 0($19)
+			lw $13, 0($19)	#$13 - variavel que envia a cor
+			addi $20, $0, 3
+			#beq $13, $20, naotemmosntro
 			bne $13, $0, temmonstro
+				naotemmosntro:
 				lw $13, 0($10)
 				j desenharcelula
 				temmonstro:
-				addi $20, $0, 1
-				bne $13, $20, desenharcelula
-					addi $4, $0, 4
-					jal moverparaesquerda
-					lw $13, 0($10)
+				addi $20, $0, 2
+				slt $20, $20, $13
+				bne $20, $0, desenharcelula
+					addi $20, $0, -2
+					beq $13, $20, pausamovdir
+					addi $20, $0, 2
+					beq $13, $20, rodargumbaparadireita
+						jal gumbaparaesquerda
+						lw $13, 0($10)
+						j desenharcelula
+						rodargumbaparadireita:
+						jal gumbaparadireita
+						lw $13, 0($10)
+						pausamovdir:
+						addi $20, $0, 2
+						sw $20, 0($19)
+						lw $13, 0($10)
 			desenharcelula:
 			sw $13, 0($8)
 			addi $8, $8, 4
@@ -52,23 +67,61 @@ main:	add $14, $0, $0		#$14 - move para direita
 	syscall
 
 # move o inimigo para a esquerda
-# entrada: $4
-# usado: $19, $20, $21, $22
-moverparaesquerda:
-	addi $20, $0, 8
-	div $23, $20
-	mfhi $20
-	bne $20, $0, naomover
-		addi $20, $0, 4
-		mul $4, $4, $20
-		addi $20, $0, -8
-		movercelula:
-			sub $21, $19, $4
-			lw $22, 0($21)
-			sw $22, -4($21)
-			addi $4, $4, -4
-			bne $4, $20, movercelula
-	naomover:
+# usado: $19, $20, $21, $22, $23, $24, $25
+gumbaparaesquerda:
+	lw $22, -20($19)	# $22 variavel que envia a cor dentro do modulo
+	addi $20, $0, 3
+	beq $22, $20, alternarparadir	# encostou em algo
+		addi $20, $0, 8
+		div $23, $20
+		mfhi $20
+		bne $20, $0, terminarmovesquerda	# deixa o movimento mais lento
+			addi $20, $0, 8			# até onde vai em relação ao $24
+			addi $24, $0, -20		# $24 - variavel de manipulação de movimento
+			addi $25, $0, 3
+			movercelulaesq:
+				add $21, $19, $24
+				lw $22, -4($21)
+				beq $22, $25, ignorar3esq	 # ignorar paredes
+				lw $22, 0($21)
+				sw $22, -4($21)
+				ignorar3esq:
+				addi $24, $24, 4
+				bne $24, $20, movercelulaesq
+				j terminarmovesquerda
+		alternarparadir:
+		addi $20, $0, 2
+		sw $20, -20($19)
+		sw $0, 0($19)
+	terminarmovesquerda:
+	jr $31
+
+# move o inimigo para a direita
+# usado: $19, $20, $21, $22, $23, $24, $25
+gumbaparadireita:
+	lw $22, 8($19)	# $22 variavel que envia a cor dentro do modulo
+	addi $20, $0, 3
+	beq $22, $20, alternarparaesq	# encostou em algo
+		addi $20, $0, 8
+		div $23, $20
+		mfhi $20
+		bne $20, $0, terminarmovdireita	# deixa o movimento mais lento
+			addi $20, $0, -2
+			sw $20, 0($19)		# fix - parar de se mover para direita sem parar
+			addi $20, $0, -8	# até onde vai em relação ao $24
+			addi $24, $0, 16	# $24 - variavel de manipulação de movimento
+			moverceluladir:
+				add $21, $19, $24
+				lw $22, 0($21)
+				sw $22, 4($21)
+				addi $24, $24, -4
+				bne $24, $20, moverceluladir
+				j terminarmovdireita
+		alternarparaesq:
+		addi $20, $0, 1
+		sw $20, 20($19)
+		sw $0, 0($19)
+	terminarmovdireita:
 	jr $31
 	
 	

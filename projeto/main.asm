@@ -14,7 +14,7 @@ main:	add $14, $0, $0		#$14 - move para direita
 		gerarlinha:
 			lw $13, 0($19)	#$13 - variavel que envia a cor
 			addi $20, $0, 3
-			#beq $13, $20, naotemmosntro
+			beq $13, $20, naotemmosntro
 			bne $13, $0, temmonstro
 				naotemmosntro:
 				lw $13, 0($10)
@@ -24,7 +24,7 @@ main:	add $14, $0, $0		#$14 - move para direita
 				slt $20, $20, $13
 				bne $20, $0, desenharcelula
 					addi $20, $0, -2
-					beq $13, $20, pausamovdir
+					beq $13, $20, pausamovdir	# fix - parar de se mover para direita sem parar
 					addi $20, $0, 2
 					beq $13, $20, rodargumbaparadireita
 						jal gumbaparaesquerda
@@ -33,6 +33,7 @@ main:	add $14, $0, $0		#$14 - move para direita
 						rodargumbaparadireita:
 						jal gumbaparadireita
 						lw $13, 0($10)
+						j desenharcelula
 						pausamovdir:
 						addi $20, $0, 2
 						sw $20, 0($19)
@@ -69,7 +70,7 @@ main:	add $14, $0, $0		#$14 - move para direita
 # move o inimigo para a esquerda
 # usado: $19, $20, $21, $22, $23, $24, $25
 gumbaparaesquerda:
-	lw $22, -20($19)	# $22 variavel que envia a cor dentro do modulo
+	lw $22, -28($19)	# $22 variavel que envia a cor dentro do modulo
 	addi $20, $0, 3
 	beq $22, $20, alternarparadir	# encostou em algo
 		addi $20, $0, 8
@@ -91,8 +92,7 @@ gumbaparaesquerda:
 				j terminarmovesquerda
 		alternarparadir:
 		addi $20, $0, 2
-		sw $20, -20($19)
-		sw $0, 0($19)
+		sw $20, 0($19)
 	terminarmovesquerda:
 	jr $31
 
@@ -108,8 +108,8 @@ gumbaparadireita:
 		bne $20, $0, terminarmovdireita	# deixa o movimento mais lento
 			addi $20, $0, -2
 			sw $20, 0($19)		# fix - parar de se mover para direita sem parar
-			addi $20, $0, -8	# até onde vai em relação ao $24
-			addi $24, $0, 16	# $24 - variavel de manipulação de movimento
+			addi $20, $0, -24	# até onde vai em relação ao $24
+			addi $24, $0, 0		# $24 - variavel de manipulação de movimento
 			moverceluladir:
 				add $21, $19, $24
 				lw $22, 0($21)
@@ -119,8 +119,7 @@ gumbaparadireita:
 				j terminarmovdireita
 		alternarparaesq:
 		addi $20, $0, 1
-		sw $20, 20($19)
-		sw $0, 0($19)
+		sw $20, 0($19)
 	terminarmovdireita:
 	jr $31
 	

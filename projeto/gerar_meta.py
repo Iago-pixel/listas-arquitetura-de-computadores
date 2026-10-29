@@ -43,9 +43,12 @@ def cano(linha_sup, coluna_esq):
 data = [["0" for _ in range(876)] for _ in range(64)]
 
 gerar_gumba(94, 55)
-gerar_gumba(170, 55)
+gerar_gumba(171, 55)
+gerar_gumba(216, 55)
 cano(48, 119)
 cano(44, 161)
+cano(40, 195)
+cano(40, 241)
 
 with open("meta.asm", "w", encoding="utf-8") as arquivo:
     arquivo.write(".data 0x1004EC00\n")

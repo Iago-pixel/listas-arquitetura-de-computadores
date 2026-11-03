@@ -23,11 +23,23 @@ main:	# dia atual = $8/$9/$10; dia seguinte = $11/$12/$13; dia anterior = $14/$1
 		 j diaanterior
 		 talvezultimodia:
 		 addi $14, $0, 31
-		 bne $8, $14, naoe30nem31
+		 bne $8, $14, naoe31
+		 	addi $11, $0, 1
+		 	addi $14, $0, 12
+		 	bne $9, $14, naoehdezembro
+		 		addi $12, $0, 1
+		 		addi $13, $13, 1
+		 		j diaanterior
+		 		naoehdezembro:
+		 		addi $12, $12, 1
+		 		j diaanterior
 		 addi $14, $0, 30
 		 bne $8, $14, naoe30nem31
-		 	addi $14, $0, 12
-		 	beq $10, $14, dezembro1
+		 	# eh 30
+		 	addi $14, $0, 1
+		 	beq $9, $14, mesde31dias
+		 	addi $14, $0, 3
+		 	beq $9, $14, mesde31dias	#continua...
 		 		addi $11, $0, 1
 		 		addi $12, $9, 1
 		 		j diaanterior

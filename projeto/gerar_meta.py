@@ -27,18 +27,14 @@ def gerar_gumba(coluna_inicial, linha_inferior):
     col_de_numero(coluna_inicial + 4, linha_inferior, 5, 1)
 
 def cano(linha_sup, coluna_esq):
-    #for i in range(4):
-        #preencher_linha(linha_sup + i, coluna_esq, 8, cor)
     col_de_numero(coluna_esq, linha_sup + 3, 4, 3)
     col_de_numero(coluna_esq + 8, linha_sup + 3, 4, 3)
 
     linha_atual = linha_sup + 4
     while linha_atual < 65:
-        #preencher_linha(linha_atual, coluna_esq + 1, 6, cor)
         numero_em_celular(linha_atual, coluna_esq + 1, 3)
         numero_em_celular(linha_atual, coluna_esq + 7, 3)
         linha_atual += 1
-
 
 data = [["0" for _ in range(876)] for _ in range(64)]
 

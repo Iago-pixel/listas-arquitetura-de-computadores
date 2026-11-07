@@ -35,8 +35,9 @@ def cano(linha_sup, coluna_esq):
         linha_atual += 1
 
 def chao(coluna_inicial, tamanho):
+    cor = "0x8b4f16"
     for i in range(9):
-        preencher_linha(56 + i, coluna_inicial, tamanho, "0x8b4f16")
+        preencher_linha(56 + i, coluna_inicial, tamanho, cor)
 
 def cubo(linha_sup, coluna_esq, cor, qtd=1):
     for i in range(qtd):
@@ -56,6 +57,58 @@ def escada(coluna_inicial, degrais, invertida=False, final_duplicado=False):
         if not invertida:
             coluna += 5
         qtd -= 1
+
+def bandeira(linha_inferior, coluna_inicial):
+    cor_base = "0xa55d17"
+    cor_bastao = "0x6cbd64"
+    cor_bandeira = "0xffffff"
+    cor_ponta_contorno = "0x538280"
+    cor_ponta_interior = "0x10700a"
+    cubo(linha_inferior - 4, coluna_inicial, cor_base)
+    for i in range(38):
+        preencher_linha(linha_inferior - 42 + i, coluna_inicial + 2, 1, cor_bastao)
+    for i in range(4):
+        preencher_linha(linha_inferior - 42 + i, coluna_inicial - 2 + i, 4 - i, cor_bandeira)
+    preencher_linha(linha_inferior - 45, coluna_inicial + 1, 1, cor_ponta_contorno)
+    preencher_linha(linha_inferior - 45, coluna_inicial + 2, 1, cor_ponta_interior)
+    preencher_linha(linha_inferior - 45, coluna_inicial + 3, 1, cor_ponta_contorno)
+    preencher_linha(linha_inferior - 44, coluna_inicial + 1, 3, cor_ponta_interior)
+    preencher_linha(linha_inferior - 43, coluna_inicial + 1, 1, cor_ponta_contorno)
+    preencher_linha(linha_inferior - 43, coluna_inicial + 2, 1, cor_ponta_interior)
+    preencher_linha(linha_inferior - 43, coluna_inicial + 3, 1, cor_ponta_contorno)
+
+def castelo(linha_inferior, coluna_inicial):
+    cor_parede_inferior = "0x985314"
+    cor_parede_superior = "0xa47250"
+    cor_interior = "0x010101"
+    piso_superior = linha_inferior - 10
+    # parede inferior
+    for i in range(10):
+        preencher_linha(linha_inferior - i, coluna_inicial, 21, cor_parede_inferior)
+    # porta
+    for i in range(8):
+        preencher_linha(linha_inferior - i, coluna_inicial + 8, 5 ,cor_interior)
+    # parede superior
+    for i in range(9):
+        preencher_linha(piso_superior - i, coluna_inicial + 4, 13, cor_parede_superior)
+    # janelas
+    for i in range(5):
+        preencher_linha(piso_superior - 2 - i, coluna_inicial + 6, 3, cor_interior)
+        preencher_linha(piso_superior - 2 - i, coluna_inicial + 12, 3, cor_interior)
+    # ameias inferiores
+    for i in range(2):
+        preencher_linha(piso_superior - i, coluna_inicial, 1, cor_parede_inferior)
+        preencher_linha(piso_superior - i, coluna_inicial + 3, 2, cor_parede_inferior)
+        preencher_linha(piso_superior - i, coluna_inicial + 7, 2, cor_parede_inferior)
+        preencher_linha(piso_superior - i, coluna_inicial + 12, 2, cor_parede_inferior)
+        preencher_linha(piso_superior - i, coluna_inicial + 16, 2, cor_parede_inferior)
+        preencher_linha(piso_superior - i, coluna_inicial + 20, 1, cor_parede_inferior)
+    # ameias superiores
+    for i in range(2):
+        preencher_linha(piso_superior - 9 - i, coluna_inicial + 4, 1, cor_parede_superior)
+        preencher_linha(piso_superior - 9 - i, coluna_inicial + 7, 2, cor_parede_superior)
+        preencher_linha(piso_superior - 9 - i, coluna_inicial + 12, 2, cor_parede_superior)
+        preencher_linha(piso_superior - 9 - i, coluna_inicial + 16, 1, cor_parede_superior)
 
 data = [["0x009290ff" for _ in range(876)] for _ in range(64)]
 
@@ -148,6 +201,9 @@ escada(620, 4, final_duplicado=True)
 escada(654, 4, invertida=True)
 escada(763, 8, final_duplicado=True)
 escada(835, 1)
+
+bandeira(56, 835)
+castelo(55, 852)
 
 with open("cenario.asm", "w", encoding="utf-8") as arquivo:
     arquivo.write(".data 0x10018000\n")

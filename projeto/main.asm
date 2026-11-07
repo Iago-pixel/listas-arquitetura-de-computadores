@@ -59,7 +59,7 @@ main:	add $14, $0, $0		#$14 - move para direita
 	beq $14, 2988, ficarparado
       	addi $17, $0, 'd'
       	bne $16, $17, ficarparado
-	addi $14, $14, 4
+	addi $14, $14, 8
 	ficarparado:
 	addi $23, $23, 1
 	j looptela

@@ -15,24 +15,36 @@ main:	add $t6, $0, $0		#$t6 - move para direita
 			lw $t5, 0($s3)	#$t5 - variavel que envia a cor
 			addi $s4, $0, 3
 			beq $t5, $s4, naotemmosntro
+			addi $s4, $0, 4
+			beq $t5, $s4, naotemmosntro
 			bne $t5, $0, temmonstro
-				naotemmosntro:
 				lw $t5, 0($t2)
 				j desenharcelula
+				naotemmosntro:
+				lw $t5, 0($s3)
+				j desenharcelula
 				temmonstro:
-				addi $s4, $0, 2
+				addi $s4, $0, 5
 				slt $s4, $s4, $t5
 				bne $s4, $0, desenharcelula
 					addi $s4, $0, -2
 					beq $t5, $s4, rodargumbaparadireita
 					addi $s4, $0, 2
 					beq $t5, $s4, rodargumbaparadireita
+					addi $s4, $0, 5
+					beq $t5, $s4, rodargravidade
+					addi $s4, $0, -5
+					beq $t5, $s4, rodargravidade
 						jal gumbaparaesquerda
-						lw $t5, 0($t2)
+						lw $t5, 0($s3)
 						j desenharcelula
 						rodargumbaparadireita:
 						jal gumbaparadireita
-						lw $t5, 0($t2)
+						lw $t5, 0($s3)
+						j desenharcelula
+						rodargravidade:
+						lw $t5, 0($s3)
+						jal gravidade
 			desenharcelula:
 			sw $t5, 0($t0)
 			addi $t0, $t0, 4
@@ -81,12 +93,12 @@ gumbaparaesquerda:
 	beq $s4, $s5, alternarparadir	# encostou em outro gumba
 
 	sub $s4, $s3, $s2	# $s4 distancia do inicio da linha
-	addi $s3, $s2, 21024
+	addi $s3, $s2, 17520
 	add $s3, $s3, $s4	# $s3 é o endereço da ponta do pé direito
-	lw $s6, -12($s3)	
+	lw $s6, -16($s3)
 	addi $s4, $0, 3
 	lw $s3, 0($sp)
-	beq $s6, $s4, alternarparadir	# encostou em algo
+	beq $s6, $s4, alternarparadir	# fix para encostar no cano
 	
 		addi $s4, $0, 8
 		div $s7, $s4
@@ -118,7 +130,8 @@ gumbaparaesquerda:
 	jr $ra
 
 # move o inimigo para a direita
-# usado: $s3, $s4, $s5, $s6, $s7, $t8, $t9
+# usado: $s2, $s3, $s4, $s5, $s6, $s7, $t8, $t9
+# $s2 - inicio da linha atual do meta
 # $s3 - valor atual do meta
 # $s4, $s5, $t8, $t9 - registrador livre para ser manipulado
 # $s6 - variavel que envia a cor dentro do modulo
@@ -135,7 +148,7 @@ gumbaparadireita:
 	beq $s4, $s5, alternarparaesq	# encostou em outro gumba
 	
 	sub $s4, $s3, $s2	# $s4 distancia do inicio da linha
-	addi $s3, $s2, 21024	# indo pro inicio da linha aonde está o pé do gumba
+	addi $s3, $s2, 17520	# indo pro inicio da linha aonde está o pé do gumba
 	add $s3, $s3, $s4	# $s3 é o endereço da ponta do pé direito
 	lw $s6, 4($s3)
 	addi $s4, $0, 3
@@ -155,7 +168,7 @@ gumbaparadireita:
 		addi $s4, $0, -2
 		sw $s4, 0($s3)		# fix - parar de se mover para direita sem parar
 		proxlinhadir:
-			addi $s4, $0, -20	# até onde vai em relação ao $t8
+			addi $s4, $0, -16	# até onde vai em relação ao $t8
 			addi $t8, $0, 0		# $t8 - variavel de manipulação de movimento
 			movceldir:
 				add $s5, $s3, $t8
@@ -163,14 +176,13 @@ gumbaparadireita:
 				sw $s6, 4($s5)
 				addi $t8, $t8, -4
 				bne $t8, $s4, movceldir
-				sw $0, 0($s5)		# preenchendo 0s a esquerda
+				sw $0, 0($s5)	# preenchendo 0s a esquerda
 			addi $t9, $t9, -1	# contador de linhas
 			beq $t9, $0, fimmovdir
 			sub $s4, $s3, $s2	# pegando distancia em relação a inicio da linha
 			addi $s3, $s2, 3504	# indo para proxima linha
 			add $s3, $s3, $s4	# indo para celula mais a direita do gumba para reiniciar ciclo
 			j proxlinhadir
-			j fimmovdir
 		por2:
 		addi $s4, $0, 2
 		sw $s4, 0($s3)
@@ -181,6 +193,50 @@ gumbaparadireita:
 	fimmovdir:
 	lw $s3, 0($sp)		# recupera valor de $s3
 	jr $ra
+
+# usado: $s3, $s4, $s2, $s6, $s5, $t8, $t9, $s7
+# $s3 - valor atual do meta
+# $s2 - inicio da linha atual do meta
+# $s4, $s5, $t8, $t9  - registrador livre para ser manipulado
+# $s6 - variavel que envia a cor dentro do modulo
+# $s7 - contador
+gravidade:
+	sw $s3, 0($sp)		# salvando o $s3 pois será alterado
 	
+	addi $s4, $0, 8
+	div $s7, $s4
+	mfhi $s4
+	bne $s4, $0, fimgrav	# deixa o movimento mais lento
 	
+	# fix - parar de cair mmuito rapido
+	addi $s4, $0, -5
+	lw $s5, 0($s3)
+	beq $s4, $s5, por5
+	addi $s4, $0, -5
+	sw $s4, 0($s3)
+
+	addi $s3, $s3, 21028	# embaixo do pé direito
+	lw $s6, 0($s3)
+	addi $s4, $0, 4
+	beq $s6, $s4, fimgrav	# ta no chao
 	
+	addi $t9, $0, 7
+	proxlinhagrav:
+		addi $s4, $0, -16		# até onde vai em relação ao $t8
+		addi $t8, $0, 0			# $t8 - variavel de manipulação de movimento
+			movcelgrav:
+				add $s5, $s3, $t8
+				lw $s6, -3504($s5)
+				sw $s6, 0($s5)
+				addi $t8, $t8, -4
+				bne $t8, $s4, movcelgrav
+		addi $s3, $s3, -3504
+		addi $t9, $t9, -1
+		bne $t9, $0, proxlinhagrav
+		j fimgrav
+	por5:
+	addi $s4, $0, 5
+	sw $s4, 0($s3)
+	fimgrav:
+	lw $s3, 0($sp)		# recupera valor de $s3
+	jr $ra

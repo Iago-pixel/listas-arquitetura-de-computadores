@@ -30,7 +30,7 @@ def cano(linha_sup, coluna_esq):
     for i in range(4):
         preencher_linha(linha_sup + i, coluna_esq, 8, cor)
     linha_atual = linha_sup + 4
-    while linha_atual < 65:
+    while linha_atual < 56:
         preencher_linha(linha_atual, coluna_esq + 1, 6, cor)
         linha_atual += 1
 

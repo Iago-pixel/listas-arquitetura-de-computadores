@@ -2,6 +2,8 @@
 # 1 -> movimenta o gumba para a esquerda
 # 2 -> movimenta o gumba para a direita
 # 3 -> paredes
+# 4 -> piso
+# 5 -> gravidade
 
 def col_de_numero(coluna, linha_inferior, tamanho, numero):
     for i in range(tamanho):
@@ -25,27 +27,38 @@ def gerar_gumba(coluna_inicial, linha_inferior):
     preencher_linha(linha_inferior - 3, coluna_inicial, 4, marrom_escuro)
     preencher_linha(linha_inferior - 4, coluna_inicial + 1, 2, marrom_escuro)
     preencher_linha(linha_inferior - 5, coluna_inicial + 3, 1, 1)
+    preencher_linha(linha_inferior - 5, coluna_inicial + 2, 1, 5)
 
 def cano(linha_sup, coluna_esq):
     col_de_numero(coluna_esq, linha_sup + 3, 4, 3)
     col_de_numero(coluna_esq + 8, linha_sup + 3, 4, 3)
 
     linha_atual = linha_sup + 4
-    while linha_atual < 65:
+    while linha_atual < 56:
         numero_em_celular(linha_atual, coluna_esq + 1, 3)
         numero_em_celular(linha_atual, coluna_esq + 7, 3)
         linha_atual += 1
 
-data = [["0" for _ in range(876)] for _ in range(64)]
+def piso(linha, coluna_inicial, tamanho):
+    preencher_linha(linha, coluna_inicial, tamanho, 4)
+
+data = [[0 for _ in range(876)] for _ in range(64)]
 
 gerar_gumba(94, 55)
 gerar_gumba(171, 55)
 gerar_gumba(216, 55)
 gerar_gumba(222, 55)
+gerar_gumba(338, 21)
+
 cano(48, 119)
 cano(44, 161)
 cano(40, 195)
 cano(40, 241)
+
+piso(56, 1, 291)
+piso(56, 300, 63)
+piso(56, 376, 269)
+piso(56, 654, 222)
 
 with open("meta.asm", "w", encoding="utf-8") as arquivo:
     arquivo.write(".data 0x1004EC00\n")

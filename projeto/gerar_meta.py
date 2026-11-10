@@ -24,7 +24,7 @@ def gerar_gumba(coluna_inicial, linha_inferior):
     preencher_linha(linha_inferior - 2, coluna_inicial, 4, marrom_escuro)
     preencher_linha(linha_inferior - 3, coluna_inicial, 4, marrom_escuro)
     preencher_linha(linha_inferior - 4, coluna_inicial + 1, 2, marrom_escuro)
-    col_de_numero(coluna_inicial + 4, linha_inferior, 5, 1)
+    preencher_linha(linha_inferior - 5, coluna_inicial + 3, 1, 1)
 
 def cano(linha_sup, coluna_esq):
     col_de_numero(coluna_esq, linha_sup + 3, 4, 3)
@@ -41,6 +41,7 @@ data = [["0" for _ in range(876)] for _ in range(64)]
 gerar_gumba(94, 55)
 gerar_gumba(171, 55)
 gerar_gumba(216, 55)
+gerar_gumba(222, 55)
 cano(48, 119)
 cano(44, 161)
 cano(40, 195)

@@ -1,127 +1,178 @@
 .text
-main:	add $14, $0, $0		#$14 - move para direita
-	lui $15, 0xffff		#$15 - verificar input teclado
-	add $23, $0, $0		#$23 - contador
+main:	add $t6, $0, $0		#$t6 - move para direita
+	lui $t7, 0xffff		#$t7 - verificar input teclado
+	add $s7, $0, $0		#$s7 - contador
 	looptela:
-	lui $8, 0x1001		#$8 - valor da UG atual
-	addi $9, $8, 0x8000	#$9 - comeco do cenario
-	addi $18, $9, 0x36C00	#$18 - comeco do meta 
-	add $10, $14, $9	#$10 - valor do dado grafico atual
-	add $19, $14, $18	#$19 - valor atual do meta
-	addi $11, $0, 64	#$11 - contador de linhas
+	lui $t0, 0x1001		#$t0 - valor da UG atual
+	addi $t1, $t0, 0x8000	#$t1 - comeco do cenario
+	addi $s2, $t1, 0x36C00	#$s2 - comeco do meta
+	add $t2, $t6, $t1	#$t2 - valor do dado grafico atual
+	add $s3, $t6, $s2	#$s3 - valor atual do meta
+	addi $t3, $0, 64	#$t3 - contador de linhas
 	gerartela:
-		addi $12, $0, 128	#$12 - contador de UG
+		addi $t4, $0, 128	#$t4 - contador de UG
 		gerarlinha:
-			lw $13, 0($19)	#$13 - variavel que envia a cor
-			addi $20, $0, 3
-			beq $13, $20, naotemmosntro
-			bne $13, $0, temmonstro
+			lw $t5, 0($s3)	#$t5 - variavel que envia a cor
+			addi $s4, $0, 3
+			beq $t5, $s4, naotemmosntro
+			bne $t5, $0, temmonstro
 				naotemmosntro:
-				lw $13, 0($10)
+				lw $t5, 0($t2)
 				j desenharcelula
 				temmonstro:
-				addi $20, $0, 2
-				slt $20, $20, $13
-				bne $20, $0, desenharcelula
-					addi $20, $0, -2
-					beq $13, $20, pausamovdir	# fix - parar de se mover para direita sem parar
-					addi $20, $0, 2
-					beq $13, $20, rodargumbaparadireita
+				addi $s4, $0, 2
+				slt $s4, $s4, $t5
+				bne $s4, $0, desenharcelula
+					addi $s4, $0, -2
+					beq $t5, $s4, rodargumbaparadireita
+					addi $s4, $0, 2
+					beq $t5, $s4, rodargumbaparadireita
 						jal gumbaparaesquerda
-						lw $13, 0($10)
+						lw $t5, 0($t2)
 						j desenharcelula
 						rodargumbaparadireita:
 						jal gumbaparadireita
-						lw $13, 0($10)
-						j desenharcelula
-						pausamovdir:
-						addi $20, $0, 2
-						sw $20, 0($19)
-						lw $13, 0($10)
+						lw $t5, 0($t2)
 			desenharcelula:
-			sw $13, 0($8)
-			addi $8, $8, 4
-			addi $10, $10, 4
-			addi $19, $19, 4
-			addi $12, $12, -1
-			bne $12, $0, gerarlinha
-		addi $9, $9, 3504
-		add $10, $14, $9
-		addi $18, $18, 3504
-		add $19, $14, $18
-		addi $11, $11, -1
-		bne $11, $0, gerartela
-	lw $16, 0($15)
-	beq $16, $0, ficarparado
-	lw $16, 4($15)
-      	addi $17, $0, ' '
-      	beq $16, $17, fim
-	beq $14, 2988, ficarparado
-      	addi $17, $0, 'd'
-      	bne $16, $17, ficarparado
-	addi $14, $14, 8
+			sw $t5, 0($t0)
+			addi $t0, $t0, 4
+			addi $t2, $t2, 4
+			addi $s3, $s3, 4
+			addi $t4, $t4, -1
+			bne $t4, $0, gerarlinha
+		addi $t1, $t1, 3504
+		add $t2, $t6, $t1
+		addi $s2, $s2, 3504
+		add $s3, $t6, $s2
+		addi $t3, $t3, -1
+		bne $t3, $0, gerartela
+	lw $s0, 0($t7)
+	beq $s0, $0, ficarparado
+	lw $s0, 4($t7)
+      	addi $s1, $0, ' '
+      	beq $s0, $s1, fim
+	beq $t6, 2988, ficarparado
+      	addi $s1, $0, 'd'
+      	bne $s0, $s1, ficarparado
+	addi $t6, $t6, 4
 	ficarparado:
-	addi $23, $23, 1
+	addi $s7, $s7, 1
 	j looptela
 	fim:
-	addi $2, $0, 10
+	addi $v0, $0, 10
 	syscall
 
 # move o inimigo para a esquerda
-# usado: $19, $20, $21, $22, $23, $24, $25
+# usado: $s2, $s3, $s4, $s5, $s6, $s7, $t8, $t9
+# $s2 - inicio da linha atual do meta
+# $s3 - valor atual do meta
+# $s4, $s5, $t8, $t9 - registrador livre para ser manipulado
+# $s6 - variavel que envia a cor dentro do modulo
+# $s7 - contador
 gumbaparaesquerda:
-	lw $22, -28($19)	# $22 variavel que envia a cor dentro do modulo
-	addi $20, $0, 3
-	beq $22, $20, alternarparadir	# encostou em algo
-		addi $20, $0, 8
-		div $23, $20
-		mfhi $20
-		bne $20, $0, terminarmovesquerda	# deixa o movimento mais lento
-			addi $20, $0, 8			# até onde vai em relação ao $24
-			addi $24, $0, -20		# $24 - variavel de manipulação de movimento
-			addi $25, $0, 3
-			movercelulaesq:
-				add $21, $19, $24
-				lw $22, -4($21)
-				beq $22, $25, ignorar3esq	 # ignorar paredes
-				lw $22, 0($21)
-				sw $22, -4($21)
-				ignorar3esq:
-				addi $24, $24, 4
-				bne $24, $20, movercelulaesq
-				j terminarmovesquerda
+	sw $s3, 0($sp)		# salvando o $s3 pois será alterado
+
+	addi $s4, $0, 2
+	lw $s5, -16($s3)
+	beq $s4, $s5, alternarparadir	# encostou em outro gumba
+	addi $s4, $0, -2
+	beq $s4, $s5, alternarparadir	# encostou em outro gumba
+	addi $s4, $0, 1
+	beq $s4, $s5, alternarparadir	# encostou em outro gumba
+
+	sub $s4, $s3, $s2	# $s4 distancia do inicio da linha
+	addi $s3, $s2, 21024
+	add $s3, $s3, $s4	# $s3 é o endereço da ponta do pé direito
+	lw $s6, -12($s3)	
+	addi $s4, $0, 3
+	lw $s3, 0($sp)
+	beq $s6, $s4, alternarparadir	# encostou em algo
+		addi $s4, $0, 8
+		div $s7, $s4
+		mfhi $s4
+		bne $s4, $0, fimmovesq	# deixa o movimento mais lento
+			addi $t9, $0, 6			# $t9 - número de linhas do gumba
+			proxlinhaesq:
+				addi $s4, $0, 4			# até onde vai em relação ao $t8
+				addi $t8, $0, -12		# $t8 - variavel de manipulação de movimento
+				movcelesq:
+					add $s5, $s3, $t8
+					lw $s6, 0($s5)
+					sw $s6, -4($s5)
+					addi $t8, $t8, 4
+					bne $t8, $s4, movcelesq
+					sw $0, 0($s5)		# preenchendo 0s a direita
+					addi $t9, $t9, -1	# contador de linhas
+					beq $t9, $0, fimmovesq
+					sub $s4, $s3, $s2	# pegando distancia em relação a inicio da linha
+					addi $s3, $s2, 3504	# indo para proxima linha
+					add $s3, $s3, $s4	# indo para celula mais a direita do gumba para reiniciar ciclo
+					j proxlinhaesq
 		alternarparadir:
-		addi $20, $0, 2
-		sw $20, 0($19)
-	terminarmovesquerda:
-	jr $31
+		addi $s4, $0, 2
+		sw $s4, 0($s3)
+	fimmovesq:
+	lw $s3, 0($sp)
+	jr $ra
 
 # move o inimigo para a direita
-# usado: $19, $20, $21, $22, $23, $24, $25
+# usado: $s3, $s4, $s5, $s6, $s7, $t8, $t9
+# $s3 - valor atual do meta
+# $s4, $s5, $t8, $t9 - registrador livre para ser manipulado
+# $s6 - variavel que envia a cor dentro do modulo
+# $s7 - contador
 gumbaparadireita:
-	lw $22, 8($19)	# $22 variavel que envia a cor dentro do modulo
-	addi $20, $0, 3
-	beq $22, $20, alternarparaesq	# encostou em algo
-		addi $20, $0, 8
-		div $23, $20
-		mfhi $20
-		bne $20, $0, terminarmovdireita	# deixa o movimento mais lento
-			addi $20, $0, -2
-			sw $20, 0($19)		# fix - parar de se mover para direita sem parar
-			addi $20, $0, -24	# até onde vai em relação ao $24
-			addi $24, $0, 0		# $24 - variavel de manipulação de movimento
-			moverceluladir:
-				add $21, $19, $24
-				lw $22, 0($21)
-				sw $22, 4($21)
-				addi $24, $24, -4
-				bne $24, $20, moverceluladir
-				j terminarmovdireita
+	sw $s3, 0($sp)		# salvando o $s3 pois será alterado
+	
+	addi $s4, $0, 1
+	lw $s5, 20($s3)
+	beq $s4, $s5, alternarparaesq	# encostou em outro gumba
+	
+	sub $s4, $s3, $s2	# $s4 distancia do inicio da linha
+	addi $s3, $s2, 21024	# indo pro inicio da linha aonde está o pé do gumba
+	add $s3, $s3, $s4	# $s3 é o endereço da ponta do pé direito
+	lw $s6, 4($s3)
+	addi $s4, $0, 3
+	lw $s3, 0($sp)		# recupera valor de $s3
+	beq $s6, $s4, alternarparaesq	# encostou em algo
+		addi $s4, $0, 8
+		div $s7, $s4
+		mfhi $s4
+		bne $s4, $0, fimmovdir	# deixa o movimento mais lento
+		
+			addi $s4, $0, -2
+			lw $s5, 0($s3)
+			beq $s5, $s4, por2
+		
+			addi $t9, $0, 6		# $t9 - número de linhas do gumba
+			addi $s4, $0, -2
+			sw $s4, 0($s3)		# fix - parar de se mover para direita sem parar
+			proxlinhadir:
+				addi $s4, $0, -20	# até onde vai em relação ao $t8
+				addi $t8, $0, 0		# $t8 - variavel de manipulação de movimento
+				movceldir:
+					add $s5, $s3, $t8
+					lw $s6, 0($s5)
+					sw $s6, 4($s5)
+					addi $t8, $t8, -4
+					bne $t8, $s4, movceldir
+					sw $0, 0($s5)		# preenchendo 0s a esquerda
+				addi $t9, $t9, -1	# contador de linhas
+				beq $t9, $0, fimmovdir
+				sub $s4, $s3, $s2	# pegando distancia em relação a inicio da linha
+				addi $s3, $s2, 3504	# indo para proxima linha
+				add $s3, $s3, $s4	# indo para celula mais a direita do gumba para reiniciar ciclo
+				j proxlinhadir
+		por2:
+		addi $s4, $0, 2
+		sw $s4, 0($s3)
+		j fimmovdir
 		alternarparaesq:
-		addi $20, $0, 1
-		sw $20, 0($19)
-	terminarmovdireita:
-	jr $31
+		addi $s4, $0, 1
+		sw $s4, 0($s3)
+	fimmovdir:
+	lw $s3, 0($sp)		# recupera valor de $s3
+	jr $ra
 	
 	
 	

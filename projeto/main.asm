@@ -87,27 +87,29 @@ gumbaparaesquerda:
 	addi $s4, $0, 3
 	lw $s3, 0($sp)
 	beq $s6, $s4, alternarparadir	# encostou em algo
+	
 		addi $s4, $0, 8
 		div $s7, $s4
 		mfhi $s4
 		bne $s4, $0, fimmovesq	# deixa o movimento mais lento
-			addi $t9, $0, 6			# $t9 - número de linhas do gumba
-			proxlinhaesq:
-				addi $s4, $0, 4			# até onde vai em relação ao $t8
-				addi $t8, $0, -12		# $t8 - variavel de manipulação de movimento
-				movcelesq:
-					add $s5, $s3, $t8
-					lw $s6, 0($s5)
-					sw $s6, -4($s5)
-					addi $t8, $t8, 4
-					bne $t8, $s4, movcelesq
-					sw $0, 0($s5)		# preenchendo 0s a direita
-					addi $t9, $t9, -1	# contador de linhas
-					beq $t9, $0, fimmovesq
-					sub $s4, $s3, $s2	# pegando distancia em relação a inicio da linha
-					addi $s3, $s2, 3504	# indo para proxima linha
-					add $s3, $s3, $s4	# indo para celula mais a direita do gumba para reiniciar ciclo
-					j proxlinhaesq
+
+		addi $t9, $0, 6			# $t9 - número de linhas do gumba
+		proxlinhaesq:
+			addi $s4, $0, 4			# até onde vai em relação ao $t8
+			addi $t8, $0, -12		# $t8 - variavel de manipulação de movimento
+			movcelesq:
+				add $s5, $s3, $t8
+				lw $s6, 0($s5)
+				sw $s6, -4($s5)
+				addi $t8, $t8, 4
+				bne $t8, $s4, movcelesq
+				sw $0, 0($s5)		# preenchendo 0s a direita
+				addi $t9, $t9, -1	# contador de linhas
+				beq $t9, $0, fimmovesq
+				sub $s4, $s3, $s2	# pegando distancia em relação a inicio da linha
+				addi $s3, $s2, 3504	# indo para proxima linha
+				add $s3, $s3, $s4	# indo para celula mais a direita do gumba para reiniciar ciclo
+				j proxlinhaesq
 		alternarparadir:
 		addi $s4, $0, 2
 		sw $s4, 0($s3)
@@ -125,7 +127,11 @@ gumbaparadireita:
 	sw $s3, 0($sp)		# salvando o $s3 pois será alterado
 	
 	addi $s4, $0, 1
-	lw $s5, 20($s3)
+	lw $s5, 16($s3)
+	beq $s4, $s5, alternarparaesq	# encostou em outro gumba
+	addi $s4, $0, 2
+	beq $s4, $s5, alternarparaesq	# encostou em outro gumba
+	addi $s4, $0, -2
 	beq $s4, $s5, alternarparaesq	# encostou em outro gumba
 	
 	sub $s4, $s3, $s2	# $s4 distancia do inicio da linha
@@ -135,34 +141,36 @@ gumbaparadireita:
 	addi $s4, $0, 3
 	lw $s3, 0($sp)		# recupera valor de $s3
 	beq $s6, $s4, alternarparaesq	# encostou em algo
+	
 		addi $s4, $0, 8
 		div $s7, $s4
 		mfhi $s4
 		bne $s4, $0, fimmovdir	# deixa o movimento mais lento
+
+		addi $s4, $0, -2
+		lw $s5, 0($s3)
+		beq $s5, $s4, por2
 		
-			addi $s4, $0, -2
-			lw $s5, 0($s3)
-			beq $s5, $s4, por2
-		
-			addi $t9, $0, 6		# $t9 - número de linhas do gumba
-			addi $s4, $0, -2
-			sw $s4, 0($s3)		# fix - parar de se mover para direita sem parar
-			proxlinhadir:
-				addi $s4, $0, -20	# até onde vai em relação ao $t8
-				addi $t8, $0, 0		# $t8 - variavel de manipulação de movimento
-				movceldir:
-					add $s5, $s3, $t8
-					lw $s6, 0($s5)
-					sw $s6, 4($s5)
-					addi $t8, $t8, -4
-					bne $t8, $s4, movceldir
-					sw $0, 0($s5)		# preenchendo 0s a esquerda
-				addi $t9, $t9, -1	# contador de linhas
-				beq $t9, $0, fimmovdir
-				sub $s4, $s3, $s2	# pegando distancia em relação a inicio da linha
-				addi $s3, $s2, 3504	# indo para proxima linha
-				add $s3, $s3, $s4	# indo para celula mais a direita do gumba para reiniciar ciclo
-				j proxlinhadir
+		addi $t9, $0, 6		# $t9 - número de linhas do gumba
+		addi $s4, $0, -2
+		sw $s4, 0($s3)		# fix - parar de se mover para direita sem parar
+		proxlinhadir:
+			addi $s4, $0, -20	# até onde vai em relação ao $t8
+			addi $t8, $0, 0		# $t8 - variavel de manipulação de movimento
+			movceldir:
+				add $s5, $s3, $t8
+				lw $s6, 0($s5)
+				sw $s6, 4($s5)
+				addi $t8, $t8, -4
+				bne $t8, $s4, movceldir
+				sw $0, 0($s5)		# preenchendo 0s a esquerda
+			addi $t9, $t9, -1	# contador de linhas
+			beq $t9, $0, fimmovdir
+			sub $s4, $s3, $s2	# pegando distancia em relação a inicio da linha
+			addi $s3, $s2, 3504	# indo para proxima linha
+			add $s3, $s3, $s4	# indo para celula mais a direita do gumba para reiniciar ciclo
+			j proxlinhadir
+			j fimmovdir
 		por2:
 		addi $s4, $0, 2
 		sw $s4, 0($s3)

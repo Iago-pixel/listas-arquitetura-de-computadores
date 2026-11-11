@@ -1,18 +1,19 @@
 .text
-main:	add $t6, $0, $0		#$t6 - move para direita
-	lui $t7, 0xffff		#$t7 - verificar input teclado
-	add $s7, $0, $0		#$s7 - contador
+main:	add $t6, $0, $0		# $t6 - move para direita
+	lui $t7, 0xffff		# $t7 - verificar input teclado
+	add $s7, $0, $0		# $s7 - contador
+	add $s1, $0, $0		# $s1 - serve para verificar se a tela andou
 	looptela:
-	lui $t0, 0x1001		#$t0 - valor da UG atual
-	addi $t1, $t0, 0x8000	#$t1 - comeco do cenario
-	addi $s2, $t1, 0x36C00	#$s2 - comeco do meta
-	add $t2, $t6, $t1	#$t2 - valor do dado grafico atual
-	add $s3, $t6, $s2	#$s3 - valor atual do meta
-	addi $t3, $0, 64	#$t3 - contador de linhas
+	lui $t0, 0x1001		# $t0 - valor da UG atual
+	addi $t1, $t0, 0x8000	# $t1 - comeco do cenario
+	addi $s2, $t1, 0x36C00	# $s2 - comeco do meta
+	add $t2, $t6, $t1	# $t2 - valor do dado grafico atual
+	add $s3, $t6, $s2	# $s3 - valor atual do meta
+	addi $t3, $0, 64	# $t3 - contador de linhas
 	gerartela:
-		addi $t4, $0, 128	#$t4 - contador de UG
+		addi $t4, $0, 128	# $t4 - contador de UG
 		gerarlinha:
-			lw $t5, 0($s3)	#$t5 - variavel que envia a cor
+			lw $t5, 0($s3)	# $t5 - variavel que envia a cor
 			addi $s4, $0, 3
 			beq $t5, $s4, naotemmosntro
 			addi $s4, $0, 4
@@ -21,10 +22,10 @@ main:	add $t6, $0, $0		#$t6 - move para direita
 				lw $t5, 0($t2)
 				j desenharcelula
 				naotemmosntro:
-				lw $t5, 0($s3)
+				lw $t5, 0($t2)
 				j desenharcelula
 				temmonstro:
-				addi $s4, $0, 5
+				addi $s4, $0, 6
 				slt $s4, $s4, $t5
 				bne $s4, $0, desenharcelula
 					addi $s4, $0, -2
@@ -35,16 +36,24 @@ main:	add $t6, $0, $0		#$t6 - move para direita
 					beq $t5, $s4, rodargravidade
 					addi $s4, $0, -5
 					beq $t5, $s4, rodargravidade
+					addi $s4, $0, 6
+					beq $t5, $s4, rodargerarmario
+					addi $s4, $0, -6
+					beq $t5, $s4, rodargerarmario
 						jal gumbaparaesquerda
-						lw $t5, 0($s3)
+						lw $t5, 0($t2)
 						j desenharcelula
 						rodargumbaparadireita:
 						jal gumbaparadireita
-						lw $t5, 0($s3)
+						lw $t5, 0($t2)
 						j desenharcelula
 						rodargravidade:
-						lw $t5, 0($s3)
+						lw $t5, 0($t2)
 						jal gravidade
+						j desenharcelula
+						rodargerarmario:
+						lw $t5, 0($t2)
+						jal gerarmario
 			desenharcelula:
 			sw $t5, 0($t0)
 			addi $t0, $t0, 4
@@ -61,11 +70,11 @@ main:	add $t6, $0, $0		#$t6 - move para direita
 	lw $s0, 0($t7)
 	beq $s0, $0, ficarparado
 	lw $s0, 4($t7)
-      	addi $s1, $0, ' '
-      	beq $s0, $s1, fim
+      	addi $s4, $0, ' '
+      	beq $s0, $s4, fim
 	beq $t6, 2988, ficarparado
-      	addi $s1, $0, 'd'
-      	bne $s0, $s1, ficarparado
+      	addi $s4, $0, 'd'
+      	bne $s0, $s4, ficarparado
 	addi $t6, $t6, 4
 	ficarparado:
 	addi $s7, $s7, 1
@@ -100,7 +109,7 @@ gumbaparaesquerda:
 	lw $s3, 0($sp)
 	beq $s6, $s4, alternarparadir	# fix para encostar no cano
 	
-		addi $s4, $0, 8
+		addi $s4, $0, 4
 		div $s7, $s4
 		mfhi $s4
 		bne $s4, $0, fimmovesq	# deixa o movimento mais lento
@@ -155,7 +164,7 @@ gumbaparadireita:
 	lw $s3, 0($sp)		# recupera valor de $s3
 	beq $s6, $s4, alternarparaesq	# encostou em algo
 	
-		addi $s4, $0, 8
+		addi $s4, $0, 4
 		div $s7, $s4
 		mfhi $s4
 		bne $s4, $0, fimmovdir	# deixa o movimento mais lento
@@ -203,11 +212,6 @@ gumbaparadireita:
 gravidade:
 	sw $s3, 0($sp)		# salvando o $s3 pois será alterado
 	
-	addi $s4, $0, 8
-	div $s7, $s4
-	mfhi $s4
-	bne $s4, $0, fimgrav	# deixa o movimento mais lento
-	
 	# fix - parar de cair mmuito rapido
 	addi $s4, $0, -5
 	lw $s5, 0($s3)
@@ -238,5 +242,46 @@ gravidade:
 	addi $s4, $0, 5
 	sw $s4, 0($s3)
 	fimgrav:
+	lw $s3, 0($sp)		# recupera valor de $s3
+	jr $ra
+
+# põe mario na tela (move ele caso tenha se movido)
+# usado: $s4, $s1, $s3, $s5, $t8, $s7
+# $s1 - serve para verificar se a tela andou
+# $s4, $s5, $t8 - registrador livre para ser manipulado
+# $s3 - valor atual do meta
+# $s7 - contador
+gerarmario:
+	sw $s3, 0($sp)		# salvando o $s3 pois será alterado
+
+	addi $s5, $0, 7
+	proxlinhaverificacao:
+		addi $s3, $s3, 3504
+		lw $s4, 4($s3)
+		bne $s4, $0, fim
+		addi $s5, $s5, -1
+		bne $s5, $0, proxlinhaverificacao
+
+	beq $s1, $t6, fimgerarmario
+	add $s1, $0, $t6
+
+	lw $s3, 0($sp)		# recupera valor de $s3
+
+	addi $s5, $0, 8
+	proxlinhamariodir:
+		addi $t8, $0, 5
+		proxcelmariodir:
+			lw $s4, 0($s3)
+			sw $s4, 4($s3)
+			addi $s3, $s3, -4
+			addi $t8, $t8, -1
+			bne $t8, $0, proxcelmariodir
+			sw $0, 0($s3)
+		addi $s3, $s3, 3524
+		addi $s5, $s5, -1
+		bne $s5, $0, proxlinhamariodir
+	
+	
+	fimgerarmario:
 	lw $s3, 0($sp)		# recupera valor de $s3
 	jr $ra
